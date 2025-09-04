@@ -6,10 +6,13 @@ const mongoose = require("mongoose");
 const methodOverride = require("method-override");
 const morgan = require("morgan");
 const session = require("express-session");
+const MongoStore = require("connect-mongo");
+
 
 
 // Controllers
 const authRouter = require("./controllers/auth.js");
+const isSignedIn = require("./middleware/is-signed-in.js");
 
 // Set the port from environment variable or default to 3000
 const port = process.env.PORT ? process.env.PORT : "3000";
@@ -32,6 +35,9 @@ app.use(
       secret: process.env.SESSION_SECRET,
       resave: false, 
       saveUninitialized: true,
+      store: MongoStore.create({
+         mongoUrl: process.env.MONGODB_URI,
+       }),
    })
 )
 
@@ -43,6 +49,9 @@ app.get("/", async (req, res) => {
    res.render("index.ejs")
    user: req.session.user
 })
+
+//isSignedIn middleware
+app.use(isSignedIn);
 
 //VIP route to test route protection
 app.get("/vip", (req, res) => {

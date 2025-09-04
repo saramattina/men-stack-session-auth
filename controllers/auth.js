@@ -12,8 +12,9 @@ router.get("/sign-in", (req, res) => {
 });
 
 router.get("/sign-out", (req, res) => {
-   req.session.destroy();
-   res.redirect("/");
+   req.session.destroy(() => {
+      res.redirect("/");
+    });
 })
 
 router.post("/sign-up", async (req, res) => {
@@ -55,9 +56,12 @@ router.post("/sign-in", async (req, res) => {
 
    //Create session
    req.session.user = {
-      username: username
-   }
-   res.redirect("/");
+      username: userInDatabase.username,
+    };
+    
+    req.session.save(() => {
+      res.redirect("/");
+    });
 })
 
 module.exports = router;
